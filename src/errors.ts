@@ -40,11 +40,11 @@ export class NoRefreshTokenProvidedError extends Error {
 }
 
 export class NotConfiguredError extends Error {
-  msg: string
+  message: string
 
-  constructor(msg: string) {
+  constructor(message: string) {
     super()
-    this.msg = msg
+    this.message = message
     this.name = 'NotConfiguredError'
   }
 }
