@@ -38,3 +38,13 @@ export class NoRefreshTokenProvidedError extends Error {
     this.name = 'NoRefreshTokenProvided'
   }
 }
+
+export class NotConfiguredError extends Error {
+  msg: string
+
+  constructor(msg: string) {
+    super()
+    this.msg = msg
+    this.name = 'NotConfiguredError'
+  }
+}
