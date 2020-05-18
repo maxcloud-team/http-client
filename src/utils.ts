@@ -49,7 +49,7 @@ export const handleTokenRefresh: HandleTokenRefresh = ({
   pushToQueue,
   processQueue,
   rejectQueue,
-}) => async (error) => {
+}) => async error => {
   if (error instanceof AuthenticationError) {
     const originalRequest = error.axiosError.config
 
