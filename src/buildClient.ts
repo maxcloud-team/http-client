@@ -17,17 +17,11 @@ import {
   UploadRequestConfig,
   UploadConfig,
 } from './types'
-import { NoRefreshTokenProvidedError } from './errors'
+import { NoRefreshTokenProvidedError, NotConfiguredError } from './errors'
 
 export const buildClient = <S extends Services>(_config: ClientConfig<S>) => {
   let config = _config
-  const {
-    services,
-    defaultService,
-    getRefreshToken,
-    getAccessToken,
-    onError,
-  } = config
+  const { services, defaultService, onError } = config
 
   let isRefreshing = false
   const setIsRefreshing = (value: boolean) => {
@@ -56,7 +50,10 @@ export const buildClient = <S extends Services>(_config: ClientConfig<S>) => {
   }
 
   const requestTokenRefresh: RequestTokenRefresh = async () => {
-    const currentRefreshToken = getRefreshToken()
+    if (!config.getRefreshToken) {
+      throw new NotConfiguredError('getRefreshToken is not provided')
+    }
+    const currentRefreshToken = config.getRefreshToken()
 
     try {
       if (!currentRefreshToken) {
@@ -93,7 +90,7 @@ export const buildClient = <S extends Services>(_config: ClientConfig<S>) => {
 
   const request = (method: Method) => <R, D = any>(
     route: string,
-    config: RequestConfig<S, D> | UploadRequestConfig<S, D> = {},
+    requestConfig: RequestConfig<S, D> | UploadRequestConfig<S, D> = {},
   ): Promise<AxiosResponse<R>> => {
     const {
       auth = true,
@@ -102,8 +99,12 @@ export const buildClient = <S extends Services>(_config: ClientConfig<S>) => {
       service,
       headers,
       ...axiosConfig
-    } = config
+    } = requestConfig
     const serviceUrl = services[service || defaultService]
+
+    if (!config.getAccessToken) {
+      throw new NotConfiguredError('getAccessToken is not provided')
+    }
 
     return axios
       .request<R>({
@@ -114,7 +115,7 @@ export const buildClient = <S extends Services>(_config: ClientConfig<S>) => {
           ...buildHeaders({
             auth,
             cors,
-            accessToken: getAccessToken(),
+            accessToken: config.getAccessToken(),
           }),
           ...headers,
         },

@@ -46,8 +46,8 @@ export interface BuildHeadersConfig {
 export interface ClientConfig<S extends Services> {
   services: S
   defaultService: keyof S
-  getRefreshToken: GetToken
-  getAccessToken: GetToken
+  getRefreshToken?: GetToken
+  getAccessToken?: GetToken
   onTokenRefreshSuccess?: (payload: object) => void
   onTokenRefreshFailure?: (e: Error) => void
   onError?: (e: AxiosError) => void
