@@ -102,9 +102,10 @@ export const buildClient = <S extends Services>(_config: ClientConfig<S>) => {
     } = requestConfig
     const serviceUrl = services[service || defaultService]
 
-    if (!config.getAccessToken) {
+    if (auth && !config.getAccessToken) {
       throw new NotConfiguredError('getAccessToken is not provided')
     }
+    const accessToken = config.getAccessToken ? config.getAccessToken() : null
 
     return axios
       .request<R>({
@@ -115,7 +116,7 @@ export const buildClient = <S extends Services>(_config: ClientConfig<S>) => {
           ...buildHeaders({
             auth,
             cors,
-            accessToken: config.getAccessToken(),
+            accessToken,
           }),
           ...headers,
         },
